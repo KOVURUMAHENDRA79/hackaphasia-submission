@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard - AI-Powered Crop Disease Detection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    <style>
+        /* Inline critical CSS for faster loading */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .loading { display: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="h-8 w-8 text-green-600">🌱</div>
+                        <h1 class="text-2xl font-bold text-gray-900">CropGuard</h1>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="setActiveTab('detection')" id="tab-detection" class="px-4 py-2 rounded-lg font-medium transition-colors bg-primary-600 text-white">
+                            Disease Detection
+                        </button>
+                        <button onclick="setActiveTab('analytics')" id="tab-analytics" class="px-4 py-2 rounded-lg font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                            Analytics
+                        </button>
+                        <button onclick="setActiveTab('market')" id="tab-market" class="px-4 py-2 rounded-lg font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                            Market
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    AI-Powered Crop Disease Detection
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Upload a photo of your crop leaves to get instant disease detection, 
+                    organic treatment recommendations, and weather-based risk alerts.
+                </p>
+            </div>
+
+            <!-- Location Selection and Weather Alert -->
+            <div class="mb-8">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Select Location</h3>
+                    <select id="location-selector" onchange="handleLocationChange(this.value)" class="input-field">
+                        <option value="mumbai">Mumbai</option>
+                        <option value="delhi">Delhi</option>
+                        <option value="bangalore">Bangalore</option>
+                        <option value="hyderabad">Hyderabad</option>
+                        <option value="chennai">Chennai</option>
+                        <option value="kolkata">Kolkata</option>
+                        <option value="pune">Pune</option>
+                        <option value="ahmedabad">Ahmedabad</option>
+                        <option value="jaipur">Jaipur</option>
+                        <option value="lucknow">Lucknow</option>
+                    </select>
+                </div>
+                <div id="weather-alert" class="hidden"></div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tab-content">
+                <!-- Disease Detection Tab -->
+                <div id="detection-tab" class="tab-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Image Upload Section -->
+                        <div class="card">
+                            <div class="flex items-center mb-6">
+                                <div class="h-6 w-6 text-primary-600 mr-3">📤</div>
+                                <h3 class="text-xl font-semibold text-gray-900">Upload Crop Image</h3>
+                            </div>
+                            <div id="image-upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-primary-400">
+                                <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+                                <div id="upload-content">
+                                    <div class="h-12 w-12 mx-auto text-gray-400 mb-4">📷</div>
+                                    <div>
+                                        <p class="text-lg font-medium text-gray-900">Upload crop image</p>
+                                        <p class="text-sm text-gray-500 mt-1">Click to select or drag & drop (max 5MB)</p>
+                                    </div>
+                                </div>
+                                <div id="image-preview" class="hidden">
+                                    <img id="preview-img" class="max-h-48 mx-auto rounded-lg shadow-md mb-4">
+                                    <p class="text-sm text-gray-600">Click to replace image</p>
+                                </div>
+                            </div>
+
+                            <!-- User Information Form -->
+                            <form id="upload-form" class="mt-6 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        📧 Email Address (for notifications)
+                                    </label>
+                                    <input type="email" id="user-email" class="input-field" placeholder="farmer@example.com" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        📍 Location (optional)
+                                    </label>
+                                    <input type="text" id="user-location" class="input-field" placeholder="City, Country">
+                                </div>
+                                <button type="submit" id="detect-btn" class="w-full py-3 px-4 rounded-lg font-medium transition-colors bg-primary-600 text-white hover:bg-primary-700">
+                                    <div class="flex items-center justify-center">
+                                        <div class="h-5 w-5 mr-2">📤</div>
+                                        Detect Disease
+                                    </div>
+                                </button>
+                            </form>
+
+                            <!-- Tips -->
+                            <div class="bg-blue-50 rounded-lg p-4 mt-4">
+                                <h4 class="font-medium text-blue-900 mb-2">Tips for best results:</h4>
+                                <ul class="text-sm text-blue-800 space-y-1">
+                                    <li>• Take photos in good lighting conditions</li>
+                                    <li>• Focus on affected leaves or plant parts</li>
+                                    <li>• Ensure the image is clear and not blurry</li>
+                                    <li>• Include multiple angles if possible</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Detection Results -->
+                        <div class="card">
+                            <div class="flex items-center mb-6">
+                                <div class="h-6 w-6 text-warning-600 mr-3">⚠️</div>
+                                <h3 class="text-xl font-semibold text-gray-900">Detection Results</h3>
+                            </div>
+                            <div id="detection-results" class="text-center py-12 text-gray-500">
+                                <div class="h-12 w-12 mx-auto mb-4 text-gray-300">🌱</div>
+                                <p>Upload an image to see disease detection results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics-tab" class="tab-content hidden">
+                    <div class="space-y-8">
+                        <div class="card">
+                            <div class="flex items-center mb-6">
+                                <div class="h-6 w-6 text-primary-600 mr-3">📊</div>
+                                <h3 class="text-xl font-semibold text-gray-900">Disease Analytics Dashboard</h3>
+                            </div>
+                            <div id="analytics-content">
+                                <div class="text-center py-12 text-gray-500">
+                                    <div class="h-12 w-12 mx-auto mb-4 text-gray-300">📊</div>
+                                    <p>No analytics data available yet</p>
+                                    <p class="text-sm">Upload images to see disease statistics</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Tab -->
+                <div id="market-tab" class="tab-content hidden">
+                    <div class="space-y-8">
+                        <div class="card">
+                            <div class="flex items-center mb-6">
+                                <div class="h-6 w-6 text-primary-600 mr-3">💰</div>
+                                <h3 class="text-xl font-semibold text-gray-900">Market Prices</h3>
+                            </div>
+                            <div id="market-content">
+                                <div class="text-center py-12 text-gray-500">
+                                    <div class="h-12 w-12 mx-auto mb-4 text-gray-300">💰</div>
+                                    <p>Market data will be displayed here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="bg-primary-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <div class="h-8 w-8 text-primary-600">🌱</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">AI Disease Detection</h3>
+                    <p class="text-gray-600">
+                        Advanced machine learning models trained on thousands of crop images 
+                        for accurate disease identification.
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-success-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <div class="h-8 w-8 text-success-600">☁️</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Weather Alerts</h3>
+                    <p class="text-gray-600">
+                        Real-time weather monitoring to predict disease risk conditions 
+                        and provide preventive recommendations.
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-warning-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <div class="h-8 w-8 text-warning-600">📚</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Multi-Language Support</h3>
+                    <p class="text-gray-600">
+                        Get results and recommendations in your local language 
+                        for better understanding and accessibility.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-16 text-center text-gray-500">
+                <p>Built for sustainable agriculture • Supporting SDGs 1, 2, 3, and 12</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
